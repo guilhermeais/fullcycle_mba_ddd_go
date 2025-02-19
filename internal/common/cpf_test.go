@@ -51,3 +51,13 @@ func TestCreateCPFWithValidCPFs(t *testing.T) {
 		})
 	}
 }
+
+func TestIsEq(t *testing.T) {
+	rawCpf := "44407433825"
+	cpf, _ := common.CreateCPF(rawCpf)
+	sameCpf, _ := common.CreateCPF(rawCpf)
+
+	if !cpf.IsEqual(sameCpf) {
+		t.Fatalf("cpf %s should be equal to %s", cpf, sameCpf)
+	}
+}

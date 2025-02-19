@@ -9,6 +9,10 @@ import (
 
 type CPF string
 
+func (actual CPF) IsEqual(other CPF) bool {
+	return actual == other
+}
+
 var knownInvalidCPFs = [...]string{
 	"00000000000",
 	"11111111111",

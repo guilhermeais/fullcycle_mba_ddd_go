@@ -35,3 +35,22 @@ func TestCreateCustomer(t *testing.T) {
 		}
 	})
 }
+
+func TestIsEqual(t *testing.T) {
+	firstCustomer, _ := entities.CreateCustomer(entities.CreateCustomerCommand{
+		CPF:      "44407433825",
+		Name:     "Guilherme Teixeira Ais",
+		Birthday: time.Date(2003, 8, 26, 0, 0, 0, 0, time.UTC),
+	})
+
+	secondCustomer, _ := entities.RestoreCustomer(entities.RestoreCustomerCommand{
+		Id:       string(firstCustomer.GetID()),
+		CPF:      "44407433825",
+		Name:     "Guilherme Teixeira Ais",
+		Birthday: time.Date(2003, 8, 26, 0, 0, 0, 0, time.UTC),
+	})
+
+	if !firstCustomer.IsEqual(secondCustomer) {
+		t.Fatalf("customer %s shoud be equal to %s", firstCustomer.GetID(), secondCustomer.GetID())
+	}
+}

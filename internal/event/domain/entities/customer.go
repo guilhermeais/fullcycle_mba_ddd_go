@@ -18,7 +18,11 @@ func (c customer) GetCPF() common.CPF {
 	return c.cpf
 }
 
-func (c customer) IsEqual(other customer) bool {
+func (c customer) GetID() customerId {
+	return c.id
+}
+
+func (c customer) IsEqual(other *customer) bool {
 	return c.id.IsEqual(other.id)
 }
 

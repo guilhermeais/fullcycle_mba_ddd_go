@@ -31,7 +31,7 @@ func (b Birthday) GetAge() int {
 
 func getYearOfBirth(birthdate time.Time, now time.Time) int {
 	age := now.Year() - birthdate.Year()
-	if now.YearDay() != birthdate.YearDay() {
+	if now.YearDay() < birthdate.YearDay() {
 		age--
 	}
 

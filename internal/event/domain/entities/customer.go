@@ -8,10 +8,11 @@ import (
 type customerId = common.UUID
 
 type customer struct {
+	common.AggregateRoot
 	id       customerId
 	cpf      common.CPF
 	name     string
-	birthday time.Time
+	birthday common.Birthday
 }
 
 func (c customer) GetCPF() common.CPF {
@@ -20,6 +21,10 @@ func (c customer) GetCPF() common.CPF {
 
 func (c customer) GetID() customerId {
 	return c.id
+}
+
+func (c customer) GetBirtday() common.Birthday {
+	return c.birthday
 }
 
 func (c customer) IsEqual(other *customer) bool {
@@ -32,7 +37,7 @@ type CreateCustomerCommand struct {
 	Birthday time.Time
 }
 
-func CreateCustomer(c CreateCustomerCommand) (*customer, error) {
+func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*customer, error) {
 	cpf, err := common.CreateCPF(c.CPF)
 	if err != nil {
 		return nil, err
@@ -43,7 +48,12 @@ func CreateCustomer(c CreateCustomerCommand) (*customer, error) {
 		return nil, err
 	}
 
-	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: c.Birthday}, nil
+	birthday, err := common.CreateBirthday(c.Birthday, clock)
+	if err != nil {
+		return nil, err
+	}
+
+	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday}, nil
 }
 
 type RestoreCustomerCommand struct {
@@ -53,7 +63,7 @@ type RestoreCustomerCommand struct {
 	Birthday time.Time
 }
 
-func RestoreCustomer(c RestoreCustomerCommand) (*customer, error) {
+func RestoreCustomer(c RestoreCustomerCommand, clock common.Clock) (*customer, error) {
 	cpf, err := common.CreateCPF(c.CPF)
 	if err != nil {
 		return nil, err
@@ -63,5 +73,11 @@ func RestoreCustomer(c RestoreCustomerCommand) (*customer, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: c.Birthday}, nil
+
+	birthday, err := common.CreateBirthday(c.Birthday, clock)
+	if err != nil {
+		return nil, err
+	}
+
+	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday}, nil
 }

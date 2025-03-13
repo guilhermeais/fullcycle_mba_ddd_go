@@ -12,6 +12,7 @@ type customer struct {
 	id       customerId
 	cpf      common.CPF
 	name     string
+	email    common.Email
 	birthday common.Birthday
 }
 
@@ -27,6 +28,10 @@ func (c customer) GetBirtday() common.Birthday {
 	return c.birthday
 }
 
+func (c customer) GetEmail() common.Email {
+	return c.email
+}
+
 func (c customer) IsEqual(other *customer) bool {
 	return c.id.IsEqual(other.id)
 }
@@ -34,6 +39,7 @@ func (c customer) IsEqual(other *customer) bool {
 type CreateCustomerCommand struct {
 	CPF      string
 	Name     string
+	Email    string
 	Birthday time.Time
 }
 
@@ -53,7 +59,12 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*customer, err
 		return nil, err
 	}
 
-	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday}, nil
+	email, err := common.CreateEmail(c.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}, nil
 }
 
 type RestoreCustomerCommand struct {
@@ -61,6 +72,7 @@ type RestoreCustomerCommand struct {
 	CPF      string
 	Name     string
 	Birthday time.Time
+	Email    string
 }
 
 func RestoreCustomer(c RestoreCustomerCommand, clock common.Clock) (*customer, error) {
@@ -79,5 +91,10 @@ func RestoreCustomer(c RestoreCustomerCommand, clock common.Clock) (*customer, e
 		return nil, err
 	}
 
-	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday}, nil
+	email, err := common.CreateEmail(c.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}, nil
 }

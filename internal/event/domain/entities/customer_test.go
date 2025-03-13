@@ -13,6 +13,7 @@ func TestCreateCustomer(t *testing.T) {
 		_, err := entities.CreateCustomer(entities.CreateCustomerCommand{
 			CPF:      "00",
 			Name:     "Guilherme Teixeira Ais",
+			Email:    "guilhermeteixeiraais@gmail.com",
 			Birthday: time.Date(2003, 8, 26, 0, 0, 0, 0, time.UTC),
 		}, common.RealClock{})
 
@@ -21,10 +22,36 @@ func TestCreateCustomer(t *testing.T) {
 		}
 	})
 
+	t.Run("customer with invalid email", func(t *testing.T) {
+		var invalidEmails = [...]string{"guilhermeteixeiraais", "gui@com"}
+		for _, invalidEmail := range invalidEmails {
+			_, err := entities.CreateCustomer(entities.CreateCustomerCommand{
+				CPF:      "44407433825",
+				Name:     "Guilherme Teixeira Ais",
+				Email:    invalidEmail,
+				Birthday: time.Date(2003, 8, 26, 0, 0, 0, 0, time.UTC),
+			}, common.RealClock{})
+
+			if err == nil {
+				t.Fatalf("error is expected when email is invalid")
+			}
+
+			if !errors.Is(err, common.ErrValidation) {
+				t.Fatal("should return a validation error when email is invalid")
+			}
+
+			expectedError := common.MakeErrEmailValidation(invalidEmail)
+			if err.Error() != expectedError.Error() {
+				t.Fatalf("expect error %q but received %q", expectedError.Error(), err.Error())
+			}
+		}
+	})
+
 	t.Run("customer with 0 years", func(t *testing.T) {
 		_, err := entities.CreateCustomer(entities.CreateCustomerCommand{
 			CPF:      "44407433825",
 			Name:     "Guilherme Teixeira Ais",
+			Email:    "guilhermeteixeiraais@gmail.com",
 			Birthday: time.Now(),
 		}, common.RealClock{})
 
@@ -45,6 +72,7 @@ func TestCreateCustomer(t *testing.T) {
 		_, err := entities.CreateCustomer(entities.CreateCustomerCommand{
 			CPF:      "44407433825",
 			Name:     "Guilherme Teixeira Ais",
+			Email:    "guilhermeteixeiraais@gmail.com",
 			Birthday: time.Now().AddDate(1, 0, 0),
 		}, common.RealClock{})
 
@@ -63,6 +91,7 @@ func TestCreateCustomer(t *testing.T) {
 			CPF:      "44407433825",
 			Name:     "Guilherme Teixeira Ais",
 			Birthday: time.Now().AddDate(-23, 0, 0),
+			Email:    "guilhermeteixeiraais@gmail.com",
 		}, common.RealClock{})
 
 		if err != nil {
@@ -84,6 +113,7 @@ func TestIsEqual(t *testing.T) {
 	firstCustomer, _ := entities.CreateCustomer(entities.CreateCustomerCommand{
 		CPF:      "44407433825",
 		Name:     "Guilherme Teixeira Ais",
+		Email:    "guilhermeteixeiraais@gmail.com",
 		Birthday: time.Date(2003, 8, 26, 0, 0, 0, 0, time.UTC),
 	}, common.RealClock{})
 
@@ -91,6 +121,7 @@ func TestIsEqual(t *testing.T) {
 		Id:       string(firstCustomer.GetID()),
 		CPF:      "44407433825",
 		Name:     "Guilherme Teixeira Ais",
+		Email:    "guilhermeteixeiraais@gmail.com",
 		Birthday: time.Date(2003, 8, 26, 0, 0, 0, 0, time.UTC),
 	}, common.RealClock{})
 

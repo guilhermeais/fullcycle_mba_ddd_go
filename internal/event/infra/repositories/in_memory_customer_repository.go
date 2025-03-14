@@ -17,7 +17,7 @@ func NewInMemoryCustomerRepository() *InMemoryCustomerRepository {
 	}
 }
 
-func (m *InMemoryCustomerRepository) Save(c *entities.Customer, _ context.Context) error {
+func (m *InMemoryCustomerRepository) Save(ctx context.Context, c *entities.Customer) error {
 	if c == nil {
 		return errors.New("customer is nil")
 	}
@@ -26,7 +26,7 @@ func (m *InMemoryCustomerRepository) Save(c *entities.Customer, _ context.Contex
 	return nil
 }
 
-func (m *InMemoryCustomerRepository) GetById(id entities.CustomerId, _ context.Context) (*entities.Customer, error) {
+func (m *InMemoryCustomerRepository) GetById(ctx context.Context, id entities.CustomerId) (*entities.Customer, error) {
 	customer, exists := m.customers[string(id)]
 	if !exists {
 		return nil, errors.New("customer not found")
@@ -34,7 +34,7 @@ func (m *InMemoryCustomerRepository) GetById(id entities.CustomerId, _ context.C
 	return customer, nil
 }
 
-func (m *InMemoryCustomerRepository) ExistsByCPF(cpf common.CPF, _ context.Context) (bool, error) {
+func (m *InMemoryCustomerRepository) ExistsByCPF(ctx context.Context, cpf common.CPF) (bool, error) {
 	for _, c := range m.customers {
 		if c.GetCPF().IsEqual(cpf) {
 			return true, nil

@@ -21,13 +21,13 @@ type RegisterCustomerResult struct {
 	CustomerId string `json:"customerId"`
 }
 
-func (cs *CustomerService) Register(command RegisterCustomerCommand, ctx context.Context) (RegisterCustomerResult, error) {
+func (cs *CustomerService) Register(ctx context.Context, command RegisterCustomerCommand) (RegisterCustomerResult, error) {
 	c, err := entities.CreateCustomer(command, cs.clockProvider)
 	if err != nil {
 		return RegisterCustomerResult{}, err
 	}
 
-	exists, err := cs.repository.ExistsByCPF(c.GetCPF(), ctx)
+	exists, err := cs.repository.ExistsByCPF(ctx, c.GetCPF())
 	if err != nil {
 		return RegisterCustomerResult{}, err
 	}
@@ -36,7 +36,7 @@ func (cs *CustomerService) Register(command RegisterCustomerCommand, ctx context
 		return RegisterCustomerResult{}, fmt.Errorf("%w: cliente com o CPF %q já existe", common.ErrConflict, c.GetCPF())
 	}
 
-	err = cs.repository.Save(c, ctx)
+	err = cs.repository.Save(ctx, c)
 	if err != nil {
 		return RegisterCustomerResult{}, err
 	}

@@ -11,10 +11,8 @@ type InMemoryCustomerRepository struct {
 	customers map[string]*entities.Customer
 }
 
-func NewInMemoryCustomerRepository() *InMemoryCustomerRepository {
-	return &InMemoryCustomerRepository{
-		customers: make(map[string]*entities.Customer),
-	}
+func NewInMemoryCustomerRepository(uow *common.UnitOfWork) *entities.CustomerRepository {
+	return entities.NewCustomerRepository(&InMemoryCustomerRepository{}, uow)
 }
 
 func (m *InMemoryCustomerRepository) Save(ctx context.Context, c *entities.Customer) error {

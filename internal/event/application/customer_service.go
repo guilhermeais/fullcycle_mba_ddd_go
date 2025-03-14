@@ -7,12 +7,15 @@ import (
 	"ingressos/internal/event/domain/entities"
 )
 
+type DomainEventManager interface {
+	Dispatch(domainEvent []any) error
+}
 type CustomerService struct {
-	repository    entities.CustomerRepository
+	repository    *entities.CustomerRepository
 	clockProvider common.Clock
 }
 
-func NewCustomerSerivce(repository entities.CustomerRepository, clock common.Clock) CustomerService {
+func NewCustomerService(repository *entities.CustomerRepository, clock common.Clock) CustomerService {
 	return CustomerService{repository, clock}
 }
 

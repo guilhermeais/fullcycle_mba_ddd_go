@@ -71,8 +71,9 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, err
 
 	customer := &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}
 	customer.AddDomainEvent(events.CustomerCreatedEvent{
-		ID:   string(customer.id),
-		Name: customer.name, Email: string(customer.email),
+		ID:       string(customer.id),
+		Name:     customer.name,
+		Email:    string(customer.email),
 		CPF:      string(customer.cpf),
 		Birthday: customer.birthday.Format(events.CustomerCreatedEventBirthdateFormat)},
 	)

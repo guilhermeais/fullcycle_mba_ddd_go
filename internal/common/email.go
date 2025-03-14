@@ -21,3 +21,7 @@ func CreateEmail(address string) (Email, error) {
 func MakeErrEmailValidation(invalidAddress string) error {
 	return fmt.Errorf("%w: o email %q não é valido", ErrValidation, invalidAddress)
 }
+
+func (actual Email) IsEqual(other Email) bool {
+	return actual == other
+}

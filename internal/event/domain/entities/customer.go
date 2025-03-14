@@ -5,45 +5,45 @@ import (
 	"time"
 )
 
-type customerId = common.UUID
+type CustomerId = common.UUID
 
-type customer struct {
+type Customer struct {
 	common.AggregateRoot
-	id       customerId
+	id       CustomerId
 	cpf      common.CPF
 	name     string
 	email    common.Email
 	birthday common.Birthday
 }
 
-func (c customer) GetCPF() common.CPF {
+func (c Customer) GetCPF() common.CPF {
 	return c.cpf
 }
 
-func (c customer) GetID() customerId {
+func (c Customer) GetID() CustomerId {
 	return c.id
 }
 
-func (c customer) GetBirtday() common.Birthday {
+func (c Customer) GetBirtday() common.Birthday {
 	return c.birthday
 }
 
-func (c customer) GetEmail() common.Email {
+func (c Customer) GetEmail() common.Email {
 	return c.email
 }
 
-func (c customer) IsEqual(other *customer) bool {
+func (c Customer) IsEqual(other *Customer) bool {
 	return c.id.IsEqual(other.id)
 }
 
 type CreateCustomerCommand struct {
-	CPF      string
-	Name     string
-	Email    string
-	Birthday time.Time
+	CPF      string    `json:"cpf"`
+	Name     string    `json:"name"`
+	Email    string    `json:"email"`
+	Birthday time.Time `json:"birthday"`
 }
 
-func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*customer, error) {
+func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, error) {
 	cpf, err := common.CreateCPF(c.CPF)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*customer, err
 		return nil, err
 	}
 
-	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}, nil
+	return &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}, nil
 }
 
 type RestoreCustomerCommand struct {
@@ -75,7 +75,7 @@ type RestoreCustomerCommand struct {
 	Email    string
 }
 
-func RestoreCustomer(c RestoreCustomerCommand, clock common.Clock) (*customer, error) {
+func RestoreCustomer(c RestoreCustomerCommand, clock common.Clock) (*Customer, error) {
 	cpf, err := common.CreateCPF(c.CPF)
 	if err != nil {
 		return nil, err
@@ -96,5 +96,5 @@ func RestoreCustomer(c RestoreCustomerCommand, clock common.Clock) (*customer, e
 		return nil, err
 	}
 
-	return &customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}, nil
+	return &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}, nil
 }

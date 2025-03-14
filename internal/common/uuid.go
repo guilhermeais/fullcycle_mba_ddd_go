@@ -8,6 +8,10 @@ func (actual UUID) IsEqual(other UUID) bool {
 	return actual == other
 }
 
+func (actual UUID) IsValid() bool {
+	return ValidateUUID(string(actual))
+}
+
 func CreateUUID() (UUID, error) {
 	uuid, err := googleUuid.NewV7()
 	if err != nil {
@@ -24,4 +28,9 @@ func RestoreUUID(inputUUID string) (UUID, error) {
 	}
 
 	return UUID(inputUUID), nil
+}
+
+func ValidateUUID(uuid string) bool {
+	err := googleUuid.Validate(uuid)
+	return err == nil
 }

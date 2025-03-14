@@ -26,7 +26,6 @@ var knownInvalidCPFs = [...]string{
 	"99999999999",
 }
 
-// CreateCPF creates a new CPF after validating the input.
 func CreateCPF(rawInput string) (CPF, error) {
 	inputOnlyDigits := extractDigits(rawInput)
 
@@ -45,14 +44,12 @@ func CreateCPF(rawInput string) (CPF, error) {
 	return CPF(inputOnlyDigits), nil
 }
 
-// extractDigits extracts only the digits from the input string.
 func extractDigits(input string) string {
 	re := regexp.MustCompile(`\d`)
 	digits := re.FindAllString(input, -1)
 	return strings.Join(digits, "")
 }
 
-// isKnownInvalidCPF checks if the CPF is in the list of known invalid CPFs.
 func isKnownInvalidCPF(cpf string) bool {
 	for _, knownInvalidCPF := range knownInvalidCPFs {
 		if cpf == knownInvalidCPF {
@@ -74,11 +71,13 @@ func isValidCPF(cpf string) bool {
 	}
 
 	receivedSecondVeifier, err := strconv.Atoi(string(cpf[10]))
+	if err != nil {
+		return false
+	}
 
 	return expectedFirstVerifier == int(cpf[9]-'0') && expectedSecondVerifier == receivedSecondVeifier
 }
 
-// calculateVerifierDigit calculates the verifier digit for the CPF.
 func calculateVerifierDigit(cpf string, length int, weight int) (int, error) {
 	sum := 0
 	for i := 0; i < length; i++ {

@@ -2,6 +2,7 @@ package entities
 
 import (
 	common "ingressos/internal/common"
+	"ingressos/internal/event/domain/events"
 	"time"
 )
 
@@ -30,6 +31,10 @@ func (c Customer) GetBirtday() common.Birthday {
 
 func (c Customer) GetEmail() common.Email {
 	return c.email
+}
+
+func (c Customer) GetName() string {
+	return c.name
 }
 
 func (c Customer) IsEqual(other *Customer) bool {
@@ -64,7 +69,14 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, err
 		return nil, err
 	}
 
-	return &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}, nil
+	customer := &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}
+	customer.AddDomainEvent(events.CustomerCreatedEvent{
+		ID:   string(customer.id),
+		Name: customer.name, Email: string(customer.email),
+		CPF:      string(customer.cpf),
+		Birthday: customer.birthday.Format(events.CustomerCreatedEventBirthdateFormat)},
+	)
+	return customer, nil
 }
 
 type RestoreCustomerCommand struct {

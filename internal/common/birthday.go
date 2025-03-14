@@ -6,7 +6,7 @@ import (
 )
 
 type Birthday struct {
-	date    time.Time
+	time.Time
 	isValid bool
 	clock   Clock
 }
@@ -18,7 +18,7 @@ func CreateBirthday(date time.Time, c Clock) (Birthday, error) {
 		return Birthday{isValid: false, clock: c}, MakeErrInvalidBirthday(age)
 	}
 
-	return Birthday{isValid: true, date: date, clock: c}, nil
+	return Birthday{isValid: true, Time: date, clock: c}, nil
 }
 
 func MakeErrInvalidBirthday(age int) error {
@@ -26,7 +26,7 @@ func MakeErrInvalidBirthday(age int) error {
 }
 
 func (b Birthday) GetAge() int {
-	return getYearOfBirth(b.date, b.clock.Now())
+	return getYearOfBirth(b.Time, b.clock.Now())
 }
 
 func getYearOfBirth(birthdate time.Time, now time.Time) int {

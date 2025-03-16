@@ -2,7 +2,6 @@ package events
 
 import "ingressos/internal/common"
 
-const CustomerCreatedEventBirthdateFormat = "2006-01-02"
 const CustomerCreatedEventName = common.EventName("CustomerCreatedEvent")
 
 type CustomerCreatedEvent struct {

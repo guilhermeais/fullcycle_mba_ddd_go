@@ -36,6 +36,11 @@ func (c *Customer) UpdateBirthdate(newBirthdate time.Time) error {
 		return err
 	}
 	c.birthday = parsedBirthday
+	c.AddDomainEvent(events.CustomerUpdatedEvent{
+		ID:       string(c.id),
+		Name:     c.name,
+		Birthday: c.birthday.Format(common.BirthdateLayout)},
+	)
 	return nil
 }
 
@@ -49,6 +54,11 @@ func (c Customer) GetName() string {
 
 func (c *Customer) UpdateName(newName string) {
 	c.name = newName
+	c.AddDomainEvent(events.CustomerUpdatedEvent{
+		ID:       string(c.id),
+		Name:     c.name,
+		Birthday: c.birthday.Format(common.BirthdateLayout)},
+	)
 }
 
 func (c Customer) IsEqual(other *Customer) bool {
@@ -89,7 +99,7 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, err
 		Name:     customer.name,
 		Email:    string(customer.email),
 		CPF:      string(customer.cpf),
-		Birthday: customer.birthday.Format(events.CustomerCreatedEventBirthdateFormat)},
+		Birthday: customer.birthday.Format(common.BirthdateLayout)},
 	)
 	return customer, nil
 }

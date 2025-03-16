@@ -8,12 +8,19 @@ import (
 type MockedDomainEvent struct {
 	SomeData string
 }
-type MockedDomainEventHandler struct {
-	handle func(event any) bool
+
+const MockedDomainEventName = common.EventName("MockedDomainGetEventName")
+
+func (md MockedDomainEvent) GetEventName() common.EventName {
+	return MockedDomainEventName
 }
 
-func (d *MockedDomainEventHandler) Handle(item any) bool {
-	return d.handle(item)
+type MockedDomainEventHandler struct {
+	handle func(event common.DomainEvent) bool
+}
+
+func (d *MockedDomainEventHandler) Handle(event common.DomainEvent) bool {
+	return d.handle(event)
 }
 
 func TestDomainEventManager(t *testing.T) {
@@ -22,8 +29,8 @@ func TestDomainEventManager(t *testing.T) {
 			domainEventManager := common.NewDomainEventManager()
 			theEvent := MockedDomainEvent{SomeData: "teste"}
 			var publishedEvent MockedDomainEvent
-			domainEventManager.Register(common.EventNameFromClass(MockedDomainEvent{}), &MockedDomainEventHandler{
-				handle: func(e any) bool {
+			domainEventManager.Register(MockedDomainEventName, &MockedDomainEventHandler{
+				handle: func(e common.DomainEvent) bool {
 					event, ok := e.(MockedDomainEvent)
 					if ok {
 						publishedEvent = event
@@ -35,6 +42,9 @@ func TestDomainEventManager(t *testing.T) {
 			anAggregate.AddDomainEvent(theEvent)
 			domainEventManager.Publish(anAggregate)
 
+			if publishedEvent.GetEventName() != MockedDomainEventName {
+				t.Fatalf("should have published the event %q but receibed %s", MockedDomainEventName, publishedEvent.GetEventName())
+			}
 			if publishedEvent.SomeData != "teste" {
 				t.Fatal("should have published the event correctly")
 			}

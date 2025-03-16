@@ -1,14 +1,19 @@
 package common
 
-type AggregateRoot struct {
-	domainEvents []any
+type EventName string
+type DomainEvent interface {
+	GetEventName() EventName
 }
 
-func (ar *AggregateRoot) AddDomainEvent(event any) {
+type AggregateRoot struct {
+	domainEvents []DomainEvent
+}
+
+func (ar *AggregateRoot) AddDomainEvent(event DomainEvent) {
 	ar.domainEvents = append(ar.domainEvents, event)
 }
 
-func (ar *AggregateRoot) GetDomainEvents() []any {
+func (ar *AggregateRoot) GetDomainEvents() []DomainEvent {
 	return ar.domainEvents
 }
 

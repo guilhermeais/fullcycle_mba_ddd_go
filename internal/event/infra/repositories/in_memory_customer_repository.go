@@ -7,12 +7,13 @@ import (
 	"ingressos/internal/event/domain/entities"
 )
 
+type customersMap map[string]*entities.Customer
 type InMemoryCustomerRepository struct {
-	customers map[string]*entities.Customer
+	customers customersMap
 }
 
 func NewInMemoryCustomerRepository(uow *common.UnitOfWork) *entities.CustomerRepository {
-	return entities.NewCustomerRepository(&InMemoryCustomerRepository{}, uow)
+	return entities.NewCustomerRepository(&InMemoryCustomerRepository{customers: customersMap{}}, uow)
 }
 
 func (m *InMemoryCustomerRepository) Save(ctx context.Context, c *entities.Customer) error {

@@ -66,7 +66,7 @@ func TestCustomerService(t *testing.T) {
 				Birthday: time.Date(1974, 4, 7, 0, 0, 0, 0, time.UTC),
 			})
 
-			if err != nil {
+			if err == nil {
 				t.Fatal("error is expected")
 			}
 

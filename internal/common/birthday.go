@@ -11,6 +11,8 @@ type Birthday struct {
 	clock   Clock
 }
 
+const BirthdateLayout = "2006-01-02"
+
 func CreateBirthday(date time.Time, c Clock) (Birthday, error) {
 	age := getYearOfBirth(date, c.Now())
 

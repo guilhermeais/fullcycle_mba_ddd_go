@@ -10,11 +10,12 @@ type CustomerId = common.UUID
 
 type Customer struct {
 	common.AggregateRoot
-	id       CustomerId
-	cpf      common.CPF
-	name     string
-	email    common.Email
-	birthday common.Birthday
+	id            CustomerId
+	cpf           common.CPF
+	name          string
+	email         common.Email
+	birthday      common.Birthday
+	clockProvider common.Clock
 }
 
 func (c Customer) GetCPF() common.CPF {
@@ -29,12 +30,25 @@ func (c Customer) GetBirtday() common.Birthday {
 	return c.birthday
 }
 
+func (c *Customer) UpdateBirthdate(newBirthdate time.Time) error {
+	parsedBirthday, err := common.CreateBirthday(newBirthdate, c.clockProvider)
+	if err != nil {
+		return err
+	}
+	c.birthday = parsedBirthday
+	return nil
+}
+
 func (c Customer) GetEmail() common.Email {
 	return c.email
 }
 
 func (c Customer) GetName() string {
 	return c.name
+}
+
+func (c *Customer) UpdateName(newName string) {
+	c.name = newName
 }
 
 func (c Customer) IsEqual(other *Customer) bool {
@@ -69,7 +83,7 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, err
 		return nil, err
 	}
 
-	customer := &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email, AggregateRoot: common.NewAggregateRoot(uuid)}
+	customer := &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email, AggregateRoot: common.NewAggregateRoot(uuid), clockProvider: clock}
 	customer.AddDomainEvent(events.CustomerCreatedEvent{
 		ID:       string(customer.id),
 		Name:     customer.name,

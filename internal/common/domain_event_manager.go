@@ -1,15 +1,15 @@
 package common
 
-type Handler interface {
+type DomainEventHandler interface {
 	Handle(event DomainEvent) bool
 }
-type Handlers map[EventName][]Handler
+type handlers map[EventName][]DomainEventHandler
 type DomainEventManager struct {
-	handlers Handlers
+	handlers handlers
 }
 
 func NewDomainEventManager() *DomainEventManager {
-	return &DomainEventManager{handlers: Handlers{}}
+	return &DomainEventManager{handlers: handlers{}}
 }
 
 func (d *DomainEventManager) Publish(aggregateRoot AggregateRoot) {
@@ -21,6 +21,6 @@ func (d *DomainEventManager) Publish(aggregateRoot AggregateRoot) {
 	}
 	aggregateRoot.ClearDomainEvents()
 }
-func (d *DomainEventManager) Register(name EventName, subscriber Handler) {
-	d.handlers[name] = append(d.handlers[name], subscriber)
+func (d *DomainEventManager) Register(name EventName, handler DomainEventHandler) {
+	d.handlers[name] = append(d.handlers[name], handler)
 }

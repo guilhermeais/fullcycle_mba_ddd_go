@@ -7,6 +7,15 @@ type DomainEvent interface {
 
 type AggregateRoot struct {
 	domainEvents []DomainEvent
+	id           UUID
+}
+
+func NewAggregateRoot(id UUID) AggregateRoot {
+	return AggregateRoot{[]DomainEvent{}, id}
+}
+
+func (ar AggregateRoot) GetID() UUID {
+	return ar.id
 }
 
 func (ar *AggregateRoot) AddDomainEvent(event DomainEvent) {

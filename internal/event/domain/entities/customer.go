@@ -69,7 +69,7 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, err
 		return nil, err
 	}
 
-	customer := &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}
+	customer := &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email, AggregateRoot: common.NewAggregateRoot(uuid)}
 	customer.AddDomainEvent(events.CustomerCreatedEvent{
 		ID:       string(customer.id),
 		Name:     customer.name,

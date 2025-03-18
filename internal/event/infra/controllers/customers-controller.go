@@ -20,7 +20,7 @@ func (c *CustomersController) Register(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&command)
 	if err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		HandleError(w, err)
 		return
 	}
 

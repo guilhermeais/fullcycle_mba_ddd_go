@@ -1,18 +1,29 @@
 package controllers
 
 import (
+	"encoding/json"
 	"errors"
 	"ingressos/internal/common"
 	"net/http"
 )
 
+type JSONError struct {
+	Error string `json:"error"`
+}
+
+func writeJSONError(w http.ResponseWriter, status int, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(JSONError{message})
+}
+
 func HandleError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, common.ErrValidation):
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		writeJSONError(w, http.StatusBadRequest, err.Error())
 	case errors.Is(err, common.ErrConflict):
-		http.Error(w, err.Error(), http.StatusConflict)
+		writeJSONError(w, http.StatusConflict, err.Error())
 	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
 	}
 }

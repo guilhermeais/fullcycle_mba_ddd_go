@@ -17,7 +17,7 @@ func TestCustomerService(t *testing.T) {
 	t.Run("Register()", func(t *testing.T) {
 		t.Run("should create a customer", func(t *testing.T) {
 			uow := &common.UnitOfWork{}
-			cService := application.NewCustomerService(repositories.NewInMemoryCustomerRepository(uow), common.RealClock{})
+			cService := application.NewCustomerService(repositories.NewInMemoryCustomerRepository(uow), common.NewDomainEventManager(), common.RealClock{})
 			res, err := cService.Register(context.Background(), application.RegisterCustomerCommand{
 				CPF:      "16211571801",
 				Name:     "Testando customer",
@@ -52,7 +52,7 @@ func TestCustomerService(t *testing.T) {
 
 		t.Run("should not create a customer with same CPF", func(t *testing.T) {
 			uow := &common.UnitOfWork{}
-			cService := application.NewCustomerService(repositories.NewInMemoryCustomerRepository(uow), common.RealClock{})
+			cService := application.NewCustomerService(repositories.NewInMemoryCustomerRepository(uow), common.NewDomainEventManager(), common.RealClock{})
 			cService.Register(context.Background(), application.RegisterCustomerCommand{
 				CPF:      "16211571801",
 				Name:     "Testando customer",
@@ -82,7 +82,7 @@ func TestCustomerService(t *testing.T) {
 			uow := &common.UnitOfWork{}
 			ctx := context.Background()
 			cRepository := repositories.NewInMemoryCustomerRepository(uow)
-			cService := application.NewCustomerService(cRepository, common.FakeClock{
+			cService := application.NewCustomerService(cRepository, common.NewDomainEventManager(), common.FakeClock{
 				MockedNow: time.Date(2025, 3, 16, 0, 0, 0, 0, time.UTC),
 			})
 			createdRes, err := cService.Register(ctx, application.RegisterCustomerCommand{

@@ -8,16 +8,14 @@ import (
 	"time"
 )
 
-type DomainEventManager interface {
-	Dispatch(domainEvent []any) error
-}
 type CustomerService struct {
-	repository    *entities.CustomerRepository
-	clockProvider common.Clock
+	repository         *entities.CustomerRepository
+	domainEventManager *common.DomainEventManager
+	clockProvider      common.Clock
 }
 
-func NewCustomerService(repository *entities.CustomerRepository, clock common.Clock) CustomerService {
-	return CustomerService{repository, clock}
+func NewCustomerService(repository *entities.CustomerRepository, domainEventManager *common.DomainEventManager, clock common.Clock) CustomerService {
+	return CustomerService{repository, domainEventManager, clock}
 }
 
 type RegisterCustomerCommand = entities.CreateCustomerCommand
@@ -76,6 +74,8 @@ func (cs *CustomerService) Update(ctx context.Context, id entities.CustomerId, c
 	if err != nil {
 		return err
 	}
+
+	go cs.domainEventManager.Publish(c.AggregateRoot)
 
 	return err
 }

@@ -14,8 +14,8 @@ type CustomerService struct {
 	clockProvider      common.Clock
 }
 
-func NewCustomerService(repository *entities.CustomerRepository, domainEventManager *common.DomainEventManager, clock common.Clock) CustomerService {
-	return CustomerService{repository, domainEventManager, clock}
+func NewCustomerService(repository *entities.CustomerRepository, domainEventManager *common.DomainEventManager, clock common.Clock) *CustomerService {
+	return &CustomerService{repository, domainEventManager, clock}
 }
 
 type RegisterCustomerCommand = entities.CreateCustomerCommand

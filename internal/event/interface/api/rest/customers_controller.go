@@ -1,18 +1,20 @@
-package controllers
+package rest
 
 import (
-	"context"
 	"encoding/json"
 	"ingressos/internal/event/application"
 	"net/http"
 )
 
 type CustomersController struct {
-	cService application.CustomerService
+	cService *application.CustomerService
 }
 
-func NewCustomersController(cService application.CustomerService) *CustomersController {
-	return &CustomersController{cService: cService}
+func NewCustomersController(mux *http.ServeMux, cService *application.CustomerService) *CustomersController {
+	c := &CustomersController{cService: cService}
+	mux.HandleFunc("POST /customers/register", c.Register)
+
+	return c
 }
 
 func (c *CustomersController) Register(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +26,7 @@ func (c *CustomersController) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx := context.Background()
+	ctx := r.Context()
 
 	result, err := c.cService.Register(ctx, command)
 	if err != nil {

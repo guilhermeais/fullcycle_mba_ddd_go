@@ -80,6 +80,32 @@ func (cs *CustomerService) Update(ctx context.Context, id entities.CustomerId, c
 	return err
 }
 
+type GetCustomerByIdResult struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	CPF       string `json:"cpf"`
+	Birthdate string `json:"birthdate"`
+}
+
+func (cs *CustomerService) GetById(ctx context.Context, idString string) (GetCustomerByIdResult, error) {
+	id, err := common.RestoreUUID(idString)
+	if err != nil {
+		return GetCustomerByIdResult{}, err
+	}
+	c, err := cs.repository.GetById(ctx, id)
+	if err != nil {
+		return GetCustomerByIdResult{}, err
+	}
+	return GetCustomerByIdResult{
+		ID:        string(c.GetID()),
+		Name:      c.GetName(),
+		Email:     string(c.GetEmail()),
+		CPF:       string(c.GetCPF()),
+		Birthdate: c.GetBirtday().Format(common.BirthdateLayout),
+	}, nil
+}
+
 func MakeErrCPFInUse(cpf common.CPF) error {
 	return fmt.Errorf("%w: cliente com o CPF %q já existe", common.ErrConflict, cpf)
 }

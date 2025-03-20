@@ -1,6 +1,10 @@
 package common
 
-import googleUuid "github.com/google/uuid"
+import (
+	"fmt"
+
+	googleUuid "github.com/google/uuid"
+)
 
 type UUID string
 
@@ -15,7 +19,7 @@ func (actual UUID) IsValid() bool {
 func CreateUUID() (UUID, error) {
 	uuid, err := googleUuid.NewV7()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%w: uuuid inválido (%s)", ErrValidation, err.Error())
 	}
 	return UUID(uuid.String()), nil
 }
@@ -24,7 +28,7 @@ func RestoreUUID(inputUUID string) (UUID, error) {
 	err := googleUuid.Validate(inputUUID)
 
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%w: uuuid inválido (%s)", ErrValidation, err.Error())
 	}
 
 	return UUID(inputUUID), nil

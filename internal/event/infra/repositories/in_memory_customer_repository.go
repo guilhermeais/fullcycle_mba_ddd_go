@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"fmt"
 	"ingressos/internal/common"
 	"ingressos/internal/event/domain/entities"
 )
@@ -28,7 +29,7 @@ func (m *InMemoryCustomerRepository) Save(ctx context.Context, c *entities.Custo
 func (m *InMemoryCustomerRepository) GetById(ctx context.Context, id entities.CustomerId) (*entities.Customer, error) {
 	customer, exists := m.customers[string(id)]
 	if !exists {
-		return nil, errors.New("customer not found")
+		return nil, fmt.Errorf("%w: Cliente não encontrado", common.ErrNotFound)
 	}
 	return customer, nil
 }

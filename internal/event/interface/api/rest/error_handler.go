@@ -23,6 +23,8 @@ func HandleError(w http.ResponseWriter, err error) {
 		writeJSONError(w, http.StatusBadRequest, err.Error())
 	case errors.Is(err, common.ErrConflict):
 		writeJSONError(w, http.StatusConflict, err.Error())
+	case errors.Is(err, common.ErrNotFound):
+		writeJSONError(w, http.StatusNotFound, err.Error())
 	default:
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 	}

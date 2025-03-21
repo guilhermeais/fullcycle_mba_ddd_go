@@ -14,6 +14,7 @@ func NewCustomersController(mux *http.ServeMux, cService *application.CustomerSe
 	c := &CustomersController{cService: cService}
 	mux.HandleFunc("POST /customers/register", c.Register)
 	mux.HandleFunc("GET /customers/{id}", c.GetById)
+	mux.HandleFunc("PATCH /customers/{id}", c.Update)
 
 	return c
 }
@@ -54,4 +55,28 @@ func (c *CustomersController) GetById(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
+}
+
+func (c *CustomersController) Update(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	idString := r.PathValue("id")
+	if idString == "" {
+		writeJSONError(w, http.StatusBadRequest, "customer id should be provided")
+	}
+	var command application.UpdateCustomerCommand
+
+	err := json.NewDecoder(r.Body).Decode(&command)
+	if err != nil {
+		HandleError(w, err)
+		return
+	}
+
+	err = c.cService.Update(ctx, idString, command)
+	if err != nil {
+		HandleError(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -141,4 +141,85 @@ func TestCustomersController(t *testing.T) {
 			}
 		})
 	})
+
+	t.Run("PATCH /customers/{id}", func(t *testing.T) {
+		t.Run("should return 404 if customer does not exists", func(t *testing.T) {
+			server, _, _ := setupTestServer()
+			defer server.Close()
+
+			nonExistingId, _ := common.CreateUUID()
+			command := application.UpdateCustomerCommand{
+				Name: "Fulano Atualizado",
+			}
+
+			body, err := json.Marshal(command)
+			if err != nil {
+				t.Fatalf("failed to create json body: %v", err)
+			}
+			req, err := http.NewRequest(http.MethodPatch, server.URL+"/customers/"+string(nonExistingId), bytes.NewBuffer(body))
+			if err != nil {
+				t.Fatalf("failed to create request: %v", err)
+			}
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatalf("failed to do the request: %v", err)
+			}
+
+			if resp.StatusCode != http.StatusNotFound {
+				t.Errorf("expected status NOT FOUND, got %v", resp.Status)
+			}
+
+			var result rest.JSONError
+			err = json.NewDecoder(resp.Body).Decode(&result)
+			if err != nil {
+				t.Fatalf("failed to decode response: %v", err)
+			}
+
+			const expectedErrorMsg = "recurso não encontrado: Cliente não encontrado"
+			if result.Error != expectedErrorMsg {
+				t.Errorf("expected message %q", expectedErrorMsg)
+			}
+		})
+
+		t.Run("should return 204 and upadte the customer", func(t *testing.T) {
+			server, cRepo, clock := setupTestServer()
+			defer server.Close()
+			ctx := context.Background()
+			c, _ := entities.CreateCustomer(entities.CreateCustomerCommand{
+				CPF:      "44407433825",
+				Name:     "Guilherme Teixeira Ais",
+				Email:    "guilhermeteixeiraais@gmail.com",
+				Birthday: time.Date(2003, 8, 26, 0, 0, 0, 0, time.UTC),
+			}, clock)
+			cRepo.Save(ctx, c)
+			command := application.UpdateCustomerCommand{
+				Name: "Fulano Atualizado",
+			}
+
+			body, err := json.Marshal(command)
+			if err != nil {
+				t.Fatalf("failed to create json body: %v", err)
+			}
+			req, err := http.NewRequest(http.MethodPatch, server.URL+"/customers/"+string(c.GetID()), bytes.NewBuffer(body))
+			if err != nil {
+				t.Fatalf("failed to create request: %v", err)
+			}
+			resp, err := http.DefaultClient.Do(req)
+			if err != nil {
+				t.Fatalf("failed to do the request: %v", err)
+			}
+			if resp.StatusCode != http.StatusNoContent {
+				t.Fatalf("expected status code of %d but received %d", http.StatusNoContent, resp.StatusCode)
+			}
+
+			cUpdated, err := cRepo.GetById(ctx, c.GetID())
+			if err != nil {
+				t.Fatalf("failed to get the customer after the request: %v", err)
+			}
+
+			if cUpdated.GetName() != "Fulano Atualizado" {
+				t.Fatalf("expected to update the name of the customer to %q, but received %q", "Fulano Atualizado", cUpdated.GetName())
+			}
+		})
+	})
 }

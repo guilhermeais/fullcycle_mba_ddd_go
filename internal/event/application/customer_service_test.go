@@ -85,9 +85,9 @@ func TestCustomerService(t *testing.T) {
 			cService := application.NewCustomerService(cRepository, common.NewDomainEventManager(), common.FakeClock{
 				MockedNow: time.Date(2025, 3, 16, 0, 0, 0, 0, time.UTC),
 			})
-			id := entities.CustomerId("invalid-uuid")
+			id, _ := common.CreateUUID()
 
-			err := cService.Update(ctx, id, application.UpdateCustomerCommand{
+			err := cService.Update(ctx, string(id), application.UpdateCustomerCommand{
 				Name:      "new name",
 				Birthdate: "1975-04-07",
 			})
@@ -127,7 +127,7 @@ func TestCustomerService(t *testing.T) {
 				t.Fatalf("expected age of %d before update but received %d", expectedAge, ageBeforeUpdate)
 			}
 
-			err = cService.Update(ctx, id, application.UpdateCustomerCommand{
+			err = cService.Update(ctx, string(id), application.UpdateCustomerCommand{
 				Name:      "new name",
 				Birthdate: "1975-04-07",
 			})

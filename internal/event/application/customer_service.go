@@ -51,7 +51,11 @@ type UpdateCustomerCommand struct {
 	Birthdate string `json:"birthdate"`
 }
 
-func (cs *CustomerService) Update(ctx context.Context, id entities.CustomerId, command UpdateCustomerCommand) error {
+func (cs *CustomerService) Update(ctx context.Context, idString string, command UpdateCustomerCommand) error {
+	id, err := common.RestoreUUID(idString)
+	if err != nil {
+		return err
+	}
 	c, err := cs.repository.GetById(ctx, id)
 	if err != nil {
 		return err

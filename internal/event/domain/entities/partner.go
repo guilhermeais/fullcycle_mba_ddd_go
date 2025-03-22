@@ -4,14 +4,15 @@ import (
 	common "ingressos/internal/common"
 )
 
-type partnerId = common.UUID
+type PartnerId = common.UUID
 
-type partner struct {
-	id   partnerId
+type Partner struct {
+	common.AggregateRoot
+	id   PartnerId
 	name string
 }
 
-func (c partner) IsEqual(other *partner) bool {
+func (c Partner) IsEqual(other *Partner) bool {
 	return c.id.IsEqual(other.id)
 }
 
@@ -19,13 +20,13 @@ type CreatePartnerCommand struct {
 	Name string
 }
 
-func CreatePartner(c CreatePartnerCommand) (*partner, error) {
+func CreatePartner(c CreatePartnerCommand) (*Partner, error) {
 	uuid, err := common.CreateUUID()
 	if err != nil {
 		return nil, err
 	}
 
-	return &partner{id: uuid, name: c.Name}, nil
+	return &Partner{id: uuid, name: c.Name, AggregateRoot: common.NewAggregateRoot(uuid)}, nil
 }
 
 type RestorePartnerCommand struct {
@@ -33,10 +34,10 @@ type RestorePartnerCommand struct {
 	Name string
 }
 
-func RestorePartner(c RestorePartnerCommand) (*partner, error) {
+func RestorePartner(c RestorePartnerCommand) (*Partner, error) {
 	uuid, err := common.RestoreUUID(c.Id)
 	if err != nil {
 		return nil, err
 	}
-	return &partner{id: uuid, name: c.Name}, nil
+	return &Partner{id: uuid, name: c.Name, AggregateRoot: common.NewAggregateRoot(uuid)}, nil
 }

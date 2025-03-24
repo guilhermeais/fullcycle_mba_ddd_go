@@ -5,7 +5,8 @@ import "ingressos/internal/common"
 const CustomerUpdatedEventName = common.EventName("CustomerUpdatedEvent")
 
 type CustomerUpdatedEvent struct {
-	ID, Name, Birthday string
+	ID             common.UUID
+	Name, Birthday string
 }
 
 func (c CustomerUpdatedEvent) GetEventName() common.EventName {

@@ -2,6 +2,7 @@ package entities
 
 import (
 	common "ingressos/internal/common"
+	"time"
 )
 
 type PartnerId = common.UUID
@@ -14,6 +15,26 @@ type Partner struct {
 
 func (c Partner) IsEqual(other *Partner) bool {
 	return c.id.IsEqual(other.id)
+}
+
+type InitEventCommand struct {
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Date        time.Time `json:"date"`
+	TotalSpots  int       `json:"totalSpots"`
+}
+
+func (p Partner) InitEvent(c InitEventCommand) (*Event, error) {
+	event, err := CreateEvent(CreateEventCommand{
+		Name:        c.Name,
+		Description: c.Description,
+		Date:        c.Date,
+		IsPublished: false,
+		TotalSpots:  c.TotalSpots,
+		PartnerId:   string(p.id),
+	})
+
+	return event, err
 }
 
 type CreatePartnerCommand struct {

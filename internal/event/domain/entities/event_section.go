@@ -14,6 +14,13 @@ type EventSection struct {
 	spots              []*EventSpot
 }
 
+func (es *EventSection) Publish() {
+	es.isPublished = true
+	for _, spot := range es.spots {
+		spot.Publish()
+	}
+}
+
 type CreateEventSectionCommand struct {
 	Name        string
 	Description string

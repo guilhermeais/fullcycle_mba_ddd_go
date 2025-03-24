@@ -37,7 +37,7 @@ func (c *Customer) UpdateBirthdate(newBirthdate time.Time) error {
 	}
 	c.birthday = parsedBirthday
 	c.AddDomainEvent(events.CustomerUpdatedEvent{
-		ID:       string(c.id),
+		ID:       c.id,
 		Name:     c.name,
 		Birthday: c.birthday.Format(common.BirthdateLayout)},
 	)
@@ -55,7 +55,7 @@ func (c Customer) GetName() string {
 func (c *Customer) UpdateName(newName string) {
 	c.name = newName
 	c.AddDomainEvent(events.CustomerUpdatedEvent{
-		ID:       string(c.id),
+		ID:       c.id,
 		Name:     c.name,
 		Birthday: c.birthday.Format(common.BirthdateLayout)},
 	)
@@ -95,7 +95,7 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, err
 
 	customer := &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email, AggregateRoot: common.NewAggregateRoot(uuid), clockProvider: clock}
 	customer.AddDomainEvent(events.CustomerCreatedEvent{
-		ID:       string(customer.id),
+		ID:       customer.id,
 		Name:     customer.name,
 		Email:    string(customer.email),
 		CPF:      string(customer.cpf),

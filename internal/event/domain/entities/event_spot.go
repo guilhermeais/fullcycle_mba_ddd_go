@@ -11,6 +11,10 @@ type EventSpot struct {
 	isPublished bool
 }
 
+func (es *EventSpot) Publish() {
+	es.isPublished = true
+}
+
 type CreateEventSpotCommand struct {
 	Location                string
 	IsReserved, IsPublished bool

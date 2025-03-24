@@ -28,11 +28,13 @@ func TestCustomerService(t *testing.T) {
 				t.Fatalf("error %q is not expected", err.Error())
 			}
 
-			if !common.ValidateUUID(res.CustomerId) {
+			customerId, err := common.RestoreUUID(res.CustomerId)
+
+			if err != nil {
 				t.Fatal("exepcted a valid customer id")
 			}
 			expectedCustomerCreatedEvent := events.CustomerCreatedEvent{
-				ID:       res.CustomerId,
+				ID:       customerId,
 				Name:     "Testando customer",
 				Email:    "testando@gmail.com",
 				CPF:      "16211571801",

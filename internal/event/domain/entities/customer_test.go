@@ -121,7 +121,7 @@ func TestCustomer(t *testing.T) {
 				t.Fatalf("expected event type %T but received %T", events.CustomerCreatedEvent{}, domainEvents[0])
 			}
 
-			if customerCreatedEvent.ID != string(c.GetID()) {
+			if customerCreatedEvent.ID != c.GetID() {
 				t.Fatalf("expected customer ID %s but received %s", c.GetID(), customerCreatedEvent.ID)
 			}
 

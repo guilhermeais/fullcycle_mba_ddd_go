@@ -8,13 +8,13 @@ import (
 const EventCreatedEventName = common.EventName("EventCreatedEvent")
 
 type EventCreatedEvent struct {
-	Id                 string
+	Id                 common.UUID
 	Name, Description  string
 	Date               time.Time
 	IsPublished        bool
 	TotalSpots         int
 	TotalSpotsReserved int
-	PartnerId          string
+	PartnerId          common.UUID
 }
 
 func (c EventCreatedEvent) GetEventName() common.EventName {

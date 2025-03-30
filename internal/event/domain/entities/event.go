@@ -66,12 +66,31 @@ func (e *Event) Publish() {
 	})
 }
 
+func (e *Event) AddSection(c CreateEventSectionCommand) error {
+	section, err := CreateEventSection(c)
+
+	if err != nil {
+		return err
+	}
+
+	e.totalSpots += c.TotalSpots
+	e.sections = append(e.sections, section)
+	return nil
+}
+
+func (e *Event) GetSections() []EventSection {
+	sections := make([]EventSection, len(e.sections))
+	for i, section := range e.sections {
+		sections[i] = *section
+	}
+	return sections
+}
+
 type CreateEventCommand struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	Date        time.Time `json:"date"`
 	IsPublished bool      `json:"isPublished"`
-	TotalSpots  int       `json:"totalSpots"`
 	PartnerId   string    `json:"partnerId"`
 }
 
@@ -92,7 +111,6 @@ func CreateEvent(command CreateEventCommand) (*Event, error) {
 		description:   command.Description,
 		date:          command.Date,
 		isPublished:   command.IsPublished,
-		totalSpots:    command.TotalSpots,
 		partnerId:     partnerId,
 		AggregateRoot: common.NewAggregateRoot(uuid),
 	}
@@ -107,6 +125,45 @@ func CreateEvent(command CreateEventCommand) (*Event, error) {
 		TotalSpotsReserved: event.totalSpotsReserved,
 		PartnerId:          event.partnerId,
 	})
+
+	return event, nil
+}
+
+type RestoreEventCommand struct {
+	Id                 string    `json:"id"`
+	Name               string    `json:"name"`
+	Description        string    `json:"description"`
+	Date               time.Time `json:"date"`
+	IsPublished        bool      `json:"isPublished"`
+	TotalSpots         int       `json:"totalSpots"`
+	PartnerId          string    `json:"partnerId"`
+	TotalSpotsReserved int       `json:"totalSpotsReserved"`
+	Sections           []*EventSection
+}
+
+func RestoreEvent(command RestoreEventCommand) (*Event, error) {
+	uuid, err := common.RestoreUUID(command.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	partnerId, err := common.RestoreUUID(command.PartnerId)
+	if err != nil {
+		return nil, err
+	}
+
+	event := &Event{
+		id:                 uuid,
+		name:               command.Name,
+		description:        command.Description,
+		date:               command.Date,
+		isPublished:        command.IsPublished,
+		partnerId:          partnerId,
+		AggregateRoot:      common.NewAggregateRoot(uuid),
+		totalSpots:         command.TotalSpots,
+		totalSpotsReserved: command.TotalSpotsReserved,
+		sections:           command.Sections,
+	}
 
 	return event, nil
 }

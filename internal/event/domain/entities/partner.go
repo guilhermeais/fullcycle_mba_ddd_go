@@ -30,7 +30,6 @@ func (p Partner) InitEvent(c InitEventCommand) (*Event, error) {
 		Description: c.Description,
 		Date:        c.Date,
 		IsPublished: false,
-		TotalSpots:  c.TotalSpots,
 		PartnerId:   string(p.id),
 	})
 

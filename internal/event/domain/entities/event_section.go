@@ -21,6 +21,22 @@ func (es *EventSection) Publish() {
 	}
 }
 
+func (es *EventSection) IsPublished() bool {
+	return es.isPublished
+}
+
+func (es *EventSection) GetID() EventSectionId {
+	return es.id
+}
+
+func (e *EventSection) GetSpots() []EventSpot {
+	spots := make([]EventSpot, len(e.spots))
+	for i, spot := range e.spots {
+		spots[i] = *spot
+	}
+	return spots
+}
+
 type CreateEventSectionCommand struct {
 	Name        string
 	Description string
@@ -34,7 +50,7 @@ func CreateEventSection(c CreateEventSectionCommand) (*EventSection, error) {
 		return nil, err
 	}
 
-	var spots = make([]*EventSpot, c.TotalSpots)
+	var spots = make([]*EventSpot, 0, c.TotalSpots)
 	for range c.TotalSpots {
 		spot, err := CreateEventSpot(CreateEventSpotCommand{})
 		if err != nil {

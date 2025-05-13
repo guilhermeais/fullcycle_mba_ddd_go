@@ -10,12 +10,13 @@ type CustomerId = common.UUID
 
 type Customer struct {
 	common.AggregateRoot
-	id            CustomerId
-	cpf           common.CPF
-	name          string
-	email         common.Email
-	birthday      common.Birthday
-	clockProvider common.Clock
+	id             CustomerId
+	cpf            common.CPF
+	name           string
+	hashedPassword common.HashedPassword
+	email          common.Email
+	birthday       common.Birthday
+	clockProvider  common.Clock
 }
 
 func (c Customer) GetCPF() common.CPF {
@@ -70,6 +71,7 @@ type CreateCustomerCommand struct {
 	Name     string    `json:"name"`
 	Email    string    `json:"email"`
 	Birthday time.Time `json:"birthday"`
+	Password string    `json:"password"`
 }
 
 func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, error) {
@@ -93,7 +95,15 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, err
 		return nil, err
 	}
 
-	customer := &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email, AggregateRoot: common.NewAggregateRoot(uuid), clockProvider: clock}
+	if len(c.Password) < 6 {
+
+	}
+	pass, err := common.CreateHashedPassword(c.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	customer := &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, hashedPassword: pass, email: email, AggregateRoot: common.NewAggregateRoot(uuid), clockProvider: clock}
 	customer.AddDomainEvent(events.CustomerCreatedEvent{
 		ID:       customer.id,
 		Name:     customer.name,
@@ -104,12 +114,38 @@ func CreateCustomer(c CreateCustomerCommand, clock common.Clock) (*Customer, err
 	return customer, nil
 }
 
+func isPasswordSecure(password string) bool {
+	if len(password) < 8 {
+		return false
+	}
+	hasUpper := false
+	hasLower := false
+	hasNumber := false
+	hasSpecial := false
+
+	for _, char := range password {
+		switch {
+		case char >= 'A' && char <= 'Z':
+			hasUpper = true
+		case char >= 'a' && char <= 'z':
+			hasLower = true
+		case char >= '0' && char <= '9':
+			hasNumber = true
+		case char == '!' || char == '@' || char == '#' || char == '$' || char == '%' || char == '^' || char == '&' || char == '*':
+			hasSpecial = true
+		}
+	}
+
+	return hasUpper && hasLower && hasNumber && hasSpecial
+}
+
 type RestoreCustomerCommand struct {
-	Id       string
-	CPF      string
-	Name     string
-	Birthday time.Time
-	Email    string
+	Id             string
+	CPF            string
+	Name           string
+	Birthday       time.Time
+	Email          string
+	HashedPassword string
 }
 
 func RestoreCustomer(c RestoreCustomerCommand, clock common.Clock) (*Customer, error) {
@@ -133,5 +169,5 @@ func RestoreCustomer(c RestoreCustomerCommand, clock common.Clock) (*Customer, e
 		return nil, err
 	}
 
-	return &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, email: email}, nil
+	return &Customer{id: uuid, cpf: cpf, name: c.Name, birthday: birthday, hashedPassword: common.HashedPassword(c.HashedPassword), email: email}, nil
 }

@@ -37,7 +37,11 @@ func (c *CustomersController) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	err = json.NewEncoder(w).Encode(result)
+	if err != nil {
+		HandleError(w, err)
+		return
+	}
 }
 
 func (c *CustomersController) GetById(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +58,11 @@ func (c *CustomersController) GetById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(result)
+	err = json.NewEncoder(w).Encode(result)
+	if err != nil {
+		HandleError(w, err)
+		return
+	}
 }
 
 func (c *CustomersController) Update(w http.ResponseWriter, r *http.Request) {
